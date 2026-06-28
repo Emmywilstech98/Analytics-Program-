@@ -1,4 +1,5 @@
 const express = require("express");
+const db = require("./db");
 
 const app = express();
 app.use(express.json());
@@ -10,7 +11,16 @@ app.get("/", (req, res) => {
 app.post("/events", (req, res) => {
   const event = req.body;
 
-  console.log("Event received:", event);
+  if (!event || !event.websiteId) {
+    return res.status(400).json({ error: "Invalid event" });
+  }
+
+  const saved = db.saveEvent({
+    ...event,
+    timestamp: new Date().toISOString(),
+  });
+
+  console.log("Event stored:", saved);
 
   res.json({ success: true });
 });
